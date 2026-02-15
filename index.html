@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0a0e1a">
+    <meta name="description" content="SMILE - Web3 Testnet Automation Bot | 100K Wallets Airdrop Farming">
+    
+    <!-- PWA -->
+    <link rel="manifest" href="public/manifest.json">
+    <link rel="apple-touch-icon" href="public/icon-192.png">
+    
+    <title>SMILE | TESTNET AUTOMATION</title>
+    
+    <style>
+        /* ==================== HACKER THEME ==================== */
+        :root {
+            --matrix-green: #00ff41;
+            --alert-red: #ff0000;
+            --warning-yellow: #ffff00;
+            --bg-dark: #0a0e1a;
+            --bg-darker: #050810;
+            --bg-lighter: #141824;
+            --text-primary: #00ff41;
+            --text-muted: #00ff4180;
+            --border-glow: #00ff4140;
+            --shadow-glow: 0 0 20px #00ff4120;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Courier New', 'Fira Code', monospace;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            position: relative;
+            min-height: 100vh;
+        }
+        
+        /* Matrix Background */
+        #matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            opacity: 0.15;
+            pointer-events: none;
+        }
+        
+        /* Scanlines Effect */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 255, 65, 0.03) 0px,
+                transparent 2px,
+                transparent 4px
+            );
+            pointer-events: none;
+            z-index: 9999;
+            animation: scanline 8s linear infinite;
+        }
+        
+        @keyframes scanline {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(10px); }
+        }
+        
+        /* Container */
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 100%;
+            padding: 16px;
+            padding-bottom: 80px;
+        }
+        
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 20px 0;
+            border-bottom: 2px solid var(--border-glow);
+            margin-bottom: 20px;
+            background: var(--bg-darker);
+            box-shadow: var(--shadow-glow);
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            letter-spacing: 8px;
+            text-shadow: 0 0 10px var(--matrix-green);
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes glow {
+            from { text-shadow: 0 0 5px var(--matrix-green); }
+            to { text-shadow: 0 0 20px var(--matrix-green), 0 0 30px var(--matrix-green); }
+        }
+        
+        .header .tagline {
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-top: 5px;
+            letter-spacing: 3px;
+        }
+        
+        .header .version {
+            font-size: 9px;
+            color: var(--warning-yellow);
+            margin-top: 3px;
+        }
+        
+        /* Status Bar */
+        .status-bar {
+            background: var(--bg-darker);
+            border: 1px solid var(--border-glow);
+            border-radius: 4px;
+            padding: 12px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-glow);
+        }
+        
+        .status-bar .stat {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            margin-bottom: 8px;
+            padding: 4px 0;
+            border-bottom: 1px solid var(--border-glow);
+        }
+        
+        .status-bar .stat:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        
+        .status-bar .stat .label {
+            color: var(--text-muted);
+        }
+        
+        .status-bar .stat .value {
+            color: var(--matrix-green);
+            font-weight: bold;
+            text-shadow: 0 0 5px var(--matrix-green);
+        }
+        
+        .status-bar .stat .value.red {
+            color: var(--alert-red);
+            text-shadow: 0 0 5px var(--alert-red);
+        }
+        
+        .status-bar .stat .value.yellow {
+            color: var(--warning-yellow);
+            text-shadow: 0 0 5px var(--warning-yellow);
+        }
+        
+        /* Navigation Tabs */
+        .tabs {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 12px 8px;
+            background: var(--bg-darker);
+            border: 1px solid var(--border-glow);
+            border-radius: 4px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 10px;
+            transition: all 0.3s;
+            box-shadow: var(--shadow-glow);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .tab:active {
+            transform: scale(0.95);
+        }
+        
+        .tab.active {
+            background: var(--matrix-green);
+            color: var(--bg-dark);
+            font-weight: bold;
+            box-shadow: 0 0 15px var(--matrix-green);
+        }
+        
+        .tab .icon {
+            font-size: 16px;
+            display: block;
+            margin-bottom: 4px;
+        }
+        
+        /* Panels */
+        .panel {
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+        
+        .panel.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Cards */
+        .card {
+            background: var(--bg-darker);
+            border: 1px solid var(--border-glow);
+            border-radius: 4px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow-glow);
+        }
+        
+        .card-title {
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-glow);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        /* Buttons */
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--bg-darker);
+            border: 2px solid var(--matrix-green);
+            border-radius: 4px;
+            color: var(--matrix-green);
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .btn:active {
+            transform: scale(0.95);
+        }
+        
+        .btn:hover {
+            background: var(--matrix-green);
+            color: var(--bg-dark);
+            box-shadow: 0 0 20px var(--matrix-green);
+        }
+        
+        .btn-danger {
+            border-color: var(--alert-red);
+            color: var(--alert-red);
+        }
+        
+        .btn-danger:hover {
+            background: var(--alert-red);
+            color: white;
+            box-shadow: 0 0 20px var(--alert-red);
+        }
+        
+        .btn-warning {
+            border-color: var(--warning-yellow);
+            color: var(--warning-yellow);
+        }
+        
+        .btn-warning:hover {
+            background: var(--warning-yellow);
+            color: var(--bg-dark);
+            box-shadow: 0 0 20px var(--warning-yellow);
+        }
+        
+        .btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+        
+        .btn:disabled:hover {
+            background: var(--bg-darker);
+            color: var(--matrix-green);
+            box-shadow: none;
+            transform: none;
+        }
+        
+        /* Input Fields */
+        .input-group {
+            margin-bottom: 16px;
+        }
+        
+        .input-group label {
+            display: block;
+            font-size: 11px;
+            margin-bottom: 6px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .input-group input,
+        .input-group textarea,
+        .input-group select {
+            width: 100%;
+            padding: 12px;
+            background: var(--bg-dark);
+            border: 1px solid var(--border-glow);
+            border-radius: 4px;
+            color: var(--matrix-green);
+            font-size: 13px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .input-group input:focus,
+        .input-group textarea:focus,
+        .input-group select:focus {
+            outline: none;
+            border-color: var(--matrix-green);
+            box-shadow: 0 0 10px var(--matrix-green);
+        }
+        
+        .input-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        /* Progress Bar */
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: var(--bg-dark);
+            border: 1px solid var(--border-glow);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 12px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--matrix-green), var(--warning-yellow));
+            transition: width 0.3s;
+            box-shadow: 0 0 10px var(--matrix-green);
+        }
+        
+        .progress-text {
+            text-align: center;
+            font-size: 10px;
+            margin-top: 4px;
+            color: var(--text-muted);
+        }
+        
+        /* Wallet Item */
+        .wallet-item {
+            background: var(--bg-dark);
+            border: 1px solid var(--border-glow);
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+        }
+        
+        .wallet-item .wallet-address {
+            font-family: 'Courier New', monospace;
+            color: var(--matrix-green);
+        }
+        
+        .wallet-item .wallet-balance {
+            color: var(--warning-yellow);
+            font-size: 10px;
+        }
+        
+        /* Testnet Item */
+        .testnet-item {
+            background: var(--bg-dark);
+            border: 1px solid var(--border-glow);
+            border-radius: 4px;
+            padding: 12px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .testnet-item:hover {
+            border-color: var(--matrix-green);
+            box-shadow: 0 0 10px var(--matrix-green);
+        }
+        
+        .testnet-item .testnet-name {
+            font-size: 13px;
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+        
+        .testnet-item .testnet-meta {
+            display: flex;
+            gap: 12px;
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+        
+        .testnet-item .testnet-score {
+            color: var(--matrix-green);
+            font-weight: bold;
+        }
+        
+        /* Log Console */
+        .log-console {
+            background: var(--bg-dark);
+            border: 1px solid var(--border-glow);
+            border-radius: 4px;
+            padding: 12px;
+            height: 200px;
+            overflow-y: auto;
+            font-size: 10px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .log-entry {
+            padding: 4px 0;
+            border-bottom: 1px solid var(--border-glow);
+        }
+        
+        .log-entry:last-child {
+            border-bottom: none;
+        }
+        
+        .log-entry.success {
+            color: var(--matrix-green);
+        }
+        
+        .log-entry.error {
+            color: var(--alert-red);
+        }
+        
+        .log-entry.warning {
+            color: var(--warning-yellow);
+        }
+        
+        .log-entry .timestamp {
+            color: var(--text-muted);
+            margin-right: 8px;
+        }
+        
+        /* Loading Spinner */
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid var(--border-glow);
+            border-top-color: var(--matrix-green);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: var(--bg-darker);
+            border: 2px solid var(--matrix-green);
+            border-radius: 4px;
+            padding: 16px 24px;
+            z-index: 10000;
+            opacity: 0;
+            transition: all 0.3s;
+            box-shadow: 0 0 20px var(--matrix-green);
+            max-width: 90%;
+        }
+        
+        .notification.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+        
+        .notification.error {
+            border-color: var(--alert-red);
+            box-shadow: 0 0 20px var(--alert-red);
+        }
+        
+        .notification.warning {
+            border-color: var(--warning-yellow);
+            box-shadow: 0 0 20px var(--warning-yellow);
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-muted);
+        }
+        
+        .empty-state .icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+        
+        .empty-state .message {
+            font-size: 12px;
+        }
+        
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 16px;
+        }
+        
+        .pagination button {
+            padding: 8px 12px;
+            background: var(--bg-darker);
+            border: 1px solid var(--border-glow);
+            border-radius: 4px;
+            color: var(--matrix-green);
+            font-size: 11px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .pagination button:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+        
+        .pagination button.active {
+            background: var(--matrix-green);
+            color: var(--bg-dark);
+        }
+        
+        /* VPN Warning */
+        .vpn-warning {
+            background: var(--bg-darker);
+            border: 2px solid var(--warning-yellow);
+            border-radius: 4px;
+            padding: 12px;
+            margin-bottom: 16px;
+            font-size: 11px;
+        }
+        
+        .vpn-warning .title {
+            font-weight: bold;
+            color: var(--warning-yellow);
+            margin-bottom: 8px;
+        }
+        
+        .vpn-warning.active {
+            border-color: var(--matrix-green);
+        }
+        
+        .vpn-warning.active .title {
+            color: var(--matrix-green);
+        }
+        
+        /* Responsive */
+        @media (max-width: 360px) {
+            .tabs {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .header h1 {
+                font-size: 24px;
+                letter-spacing: 4px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Matrix Background Canvas -->
+    <canvas id="matrix-bg"></canvas>
+    
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>SMILE</h1>
+            <div class="tagline">TESTNET AUTOMATION SYSTEM</div>
+            <div class="version">v2.0.0 | 100K WALLETS</div>
+        </div>
+        
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <div class="stat">
+                <span class="label">> WALLETS:</span>
+                <span class="value" id="walletCount">0</span>
+            </div>
+            <div class="stat">
+                <span class="label">> TESTNETS:</span>
+                <span class="value" id="testnetCount">0</span>
+            </div>
+            <div class="stat">
+                <span class="label">> COMPLETED:</span>
+                <span class="value yellow" id="completedCount">0</span>
+            </div>
+            <div class="stat">
+                <span class="label">> VPN STATUS:</span>
+                <span class="value red" id="vpnStatus">OFFLINE</span>
+            </div>
+        </div>
+        
+        <!-- Navigation Tabs -->
+        <div class="tabs">
+            <div class="tab active" data-tab="home">
+                <span class="icon">🏠</span>
+                <div>HOME</div>
+            </div>
+            <div class="tab" data-tab="wallets">
+                <span class="icon">👛</span>
+                <div>WALLETS</div>
+            </div>
+            <div class="tab" data-tab="discover">
+                <span class="icon">🔍</span>
+                <div>DISCOVER</div>
+            </div>
+            <div class="tab" data-tab="custom">
+                <span class="icon">📝</span>
+                <div>CUSTOM</div>
+            </div>
+            <div class="tab" data-tab="fund">
+                <span class="icon">💰</span>
+                <div>FUND</div>
+            </div>
+            <div class="tab" data-tab="settings">
+                <span class="icon">⚙️</span>
+                <div>SETTINGS</div>
+            </div>
+        </div>
+        
+        <!-- HOME PANEL -->
+        <div class="panel active" id="home">
+            <div class="card">
+                <div class="card-title">> QUICK ACTIONS</div>
+                <button class="btn" id="discoverBtn">🔍 DISCOVER TESTNETS</button>
+                <button class="btn" id="executeAllBtn" disabled>⚡ EXECUTE ALL</button>
+                <button class="btn btn-warning" id="checkEligibilityBtn" disabled>🎁 CHECK ELIGIBILITY</button>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">> RECENT ACTIVITY</div>
+                <div class="log-console" id="recentLogs"></div>
+            </div>
+        </div>
+        
+        <!-- WALLETS PANEL -->
+        <div class="panel" id="wallets">
+            <div class="card">
+                <div class="card-title">> GENERATE WALLETS</div>
+                <div class="input-group">
+                    <label>WALLET COUNT (1-100,000):</label>
+                    <input type="number" id="walletAmount" min="1" max="100000" value="10" placeholder="Enter number">
+                </div>
+                <div class="input-group">
+                    <label>CHAIN TYPE:</label>
+                    <select id="chainType">
+                        <option value="eth">Ethereum (ETH)</option>
+                        <option value="btc">Bitcoin (BTC)</option>
+                        <option value="sol">Solana (SOL)</option>
+                    </select>
+                </div>
+                <button class="btn" id="generateWalletsBtn">🔨 GENERATE WALLETS</button>
+                <button class="btn btn-warning" id="exportWalletsBtn">📤 EXPORT ALL</button>
+                <button class="btn btn-danger" id="clearWalletsBtn">🗑️ CLEAR ALL</button>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">> WALLET LIST</div>
+                <div class="progress-bar" id="generateProgress" style="display: none;">
+                    <div class="progress-fill" id="generateProgressFill" style="width: 0%"></div>
+                </div>
+                <div class="progress-text" id="generateProgressText" style="display: none;"></div>
+                <div id="walletList"></div>
+                <div class="pagination" id="walletPagination"></div>
+            </div>
+        </div>
+        
+        <!-- DISCOVER PANEL -->
+        <div class="panel" id="discover">
+            <div class="vpn-warning" id="vpnWarning">
+                <div class="title">⚠️ VPN RECOMMENDED</div>
+                <div>For better privacy, enable VPN on your device before discovering testnets.</div>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">> AVAILABLE TESTNETS</div>
+                <button class="btn" id="refreshTestnetsBtn">🔄 REFRESH LIST</button>
+                <button class="btn btn-warning" id="showNewOnlyBtn">⭐ NEW ONLY</button>
+                <div id="testnetList"></div>
+            </div>
+        </div>
+        
+        <!-- CUSTOM PANEL -->
+        <div class="panel" id="custom">
+            <div class="card">
+                <div class="card-title">> CUSTOM TASK INPUT</div>
+                <div class="input-group">
+                    <label>METHOD 1: PASTE TEXT</label>
+                    <textarea id="customTaskInput" placeholder="Example:&#10;Claim scroll faucet, swap 0.1 ETH to USDC, then bridge to Ethereum"></textarea>
+                </div>
+                <button class="btn" id="parseTaskBtn">🤖 ANALYZE TASK</button>
+                
+                <div class="input-group">
+                    <label>METHOD 2: PASTE URL</label>
+                    <input type="text" id="customTaskUrl" placeholder="https://testnet.xyz/tasks">
+                </div>
+                <button class="btn" id="parseUrlBtn">🌐 FETCH FROM URL</button>
+            </div>
+            
+            <div class="card" id="parsedTaskCard" style="display: none;">
+                <div class="card-title">> PARSED TASK</div>
+                <div id="parsedTaskSteps"></div>
+                <button class="btn" id="executeCustomBtn">▶️ EXECUTE TASK</button>
+            </div>
+        </div>
+        
+        <!-- FUND PANEL -->
+        <div class="panel" id="fund">
+            <div class="card">
+                <div class="card-title">> CASCADE FUNDING</div>
+                <div class="input-group">
+                    <label>TOTAL AMOUNT (ETH):</label>
+                    <input type="number" id="cascadeAmount" step="0.001" placeholder="0.1">
+                </div>
+                <button class="btn" id="cascadeForwardBtn" disabled>➡️ CASCADE FORWARD</button>
+                <button class="btn btn-warning" id="cascadeReverseBtn" disabled>⬅️ CASCADE REVERSE</button>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">> FUNDING PROGRESS</div>
+                <div class="progress-bar" id="fundProgress" style="display: none;">
+                    <div class="progress-fill" id="fundProgressFill" style="width: 0%"></div>
+                </div>
+                <div class="progress-text" id="fundProgressText" style="display: none;"></div>
+                <div class="log-console" id="fundLogs"></div>
+            </div>
+        </div>
+        
+        <!-- SETTINGS PANEL -->
+        <div class="panel" id="settings">
+            <div class="card">
+                <div class="card-title">> BACKEND CONFIG</div>
+                <div class="input-group">
+                    <label>API URL:</label>
+                    <input type="text" id="apiUrlInput" value="https://smile-backend.vercel.app">
+                </div>
+                <div class="input-group">
+                    <label>TASK DELAY (seconds):</label>
+                    <input type="number" id="taskDelay" value="5" min="1" max="60">
+                </div>
+                <div class="input-group">
+                    <label>WALLET DELAY (seconds):</label>
+                    <input type="number" id="walletDelay" value="45" min="10" max="300">
+                </div>
+                <button class="btn" id="saveSettingsBtn">💾 SAVE SETTINGS</button>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">> DATA MANAGEMENT</div>
+                <button class="btn btn-warning" id="exportDataBtn">📤 EXPORT ALL DATA</button>
+                <button class="btn btn-danger" id="clearAllDataBtn">🗑️ CLEAR ALL DATA</button>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">> ABOUT</div>
+                <div style="font-size: 11px; line-height: 1.6; color: var(--text-muted);">
+                    <p><strong>SMILE v2.0.0</strong></p>
+                    <p>Testnet Automation System</p>
+                    <p>Max Wallets: 100,000</p>
+                    <p>Cost: $0 Forever</p>
+                    <p style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-glow);">
+                        Built for airdrop farming on FREE testnets only.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Notification Toast -->
+    <div class="notification" id="notification"></div>
+    
+    <!-- Scripts -->
+    <script src="src/core/config.js"></script>
+    <script src="src/core/db.js"></script>
+    <script src="src/utils/walletManager.js"></script>
+    <script src="src/utils/apiClient.js"></script>
+    <script src="src/utils/executor.js"></script>
+    <script src="src/utils/cascadeFunding.js"></script>
+    <script src="src/utils/taskParser.js"></script>
+    <script src="src/ui/ui.js"></script>
+    <script src="src/core/app.js"></script>
+</body>
+</html>

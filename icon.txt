@@ -1,0 +1,17 @@
+Icon Placeholder Files
+
+Create these icons for your PWA:
+- icon-192.png (192x192 pixels)
+- icon-512.png (512x512 pixels)
+
+Colors:
+- Background: #0a0e1a (dark)
+- Text: #00ff41 (matrix green)
+- Design: "SMILE" text or emoji 😊
+
+You can create these using:
+1. Canva.com (free, mobile-friendly)
+2. GIMP (desktop)
+3. Any image editor
+
+Or use this temporary emoji as icon until you make custom ones.

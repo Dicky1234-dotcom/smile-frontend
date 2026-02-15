@@ -1,0 +1,41 @@
+{
+  "name": "SMILE - Testnet Automation Bot",
+  "short_name": "SMILE",
+  "description": "Web3 Testnet Automation - 100K Wallets Airdrop Farming",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0e1a",
+  "theme_color": "#00ff41",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/public/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/public/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["finance", "productivity", "utilities"],
+  "shortcuts": [
+    {
+      "name": "Generate Wallets",
+      "short_name": "Wallets",
+      "description": "Generate new wallets",
+      "url": "/?action=wallets",
+      "icons": [{ "src": "/public/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Discover Testnets",
+      "short_name": "Discover",
+      "description": "Find new testnets",
+      "url": "/?action=discover",
+      "icons": [{ "src": "/public/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}
