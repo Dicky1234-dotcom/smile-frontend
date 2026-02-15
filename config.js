@@ -1,6 +1,6 @@
 // SMILE Bot Configuration
 const CONFIG = {
-    apiUrl: localStorage.getItem('apiUrl') || 'https://smile-backend.vercel.app',
+    apiUrl: localStorage.getItem('apiUrl') || 'https://smile-backend-psi.vercel.app',
     taskDelay: parseInt(localStorage.getItem('taskDelay')) || 5,
     walletDelay: parseInt(localStorage.getItem('walletDelay')) || 45,
     maxWallets: 100000,
